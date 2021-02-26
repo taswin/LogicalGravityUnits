@@ -42,17 +42,14 @@ public class LogicalGravityUnits extends StarMod
     @Override
     public void onBlockConfigLoad(BlockConfig config)
     {
-        short[] texOff = new short[]
+        short[] lguTextures = new short[]
         {
-            customTextureIds[0], customTextureIds[2], customTextureIds[4], customTextureIds[4], customTextureIds[4], customTextureIds[4]
-        };
-        short[] texOn = new short[]
-        {
-            customTextureIds[1], customTextureIds[3], customTextureIds[5], customTextureIds[5], customTextureIds[5], customTextureIds[5]
+            customTextureIds[0], customTextureIds[2], customTextureIds[4], customTextureIds[4], customTextureIds[4], customTextureIds[4]//on
+            //customTextureIds[1], customTextureIds[3], customTextureIds[5], customTextureIds[5], customTextureIds[5], customTextureIds[5]//off
         };
 
 
-        logicalGravityUnit = config.newElement(this, "Logical Gravity Unit", texOff);//ElementKeyMap.getInfo(56).getTextureIds());//new short[]{288, 289, 290, 290, 290, 290});
+        logicalGravityUnit = BlockConfig.newElement(this, "Logical Gravity Unit", lguTextures);//ElementKeyMap.getInfo(56).getTextureIds());//new short[]{288, 289, 290, 290, 290, 290});
         logicalGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
 
         logicalGravityUnit.volume = 0.1f;
@@ -71,7 +68,7 @@ public class LogicalGravityUnits extends StarMod
 
         //logicalGravityUnit.text
 
-        config.add(logicalGravityUnit);
+        BlockConfig.add(logicalGravityUnit);
 
         BlockConfig.addRecipe(logicalGravityUnit, 5, 3,
                 new FactoryResource(1, (short) 56),//gravity Unit
@@ -104,30 +101,30 @@ public class LogicalGravityUnits extends StarMod
         {
             customTextureIds = new short[]
             {
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(768, 0, 256, 256)).getTextureId(),
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(0, 0, 256, 256)).getTextureId(),
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1024, 0, 256, 256)).getTextureId(),
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(256, 0, 256, 256)).getTextureId(),
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1280, 0, 256, 256)).getTextureId(),
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(512, 0, 256, 256)).getTextureId()
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(0, 0, 256, 256)).getTextureId(),//On top
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(768, 0, 256, 256)).getTextureId(),//Off top
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(256, 0, 256, 256)).getTextureId(),//On bottom
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1024, 0, 256, 256)).getTextureId(),//Off bottom
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(512, 0, 256, 256)).getTextureId(),//On side
+                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1280, 0, 256, 256)).getTextureId()//Off side
             };
         }
 
-        StarLoader.registerListener(SegmentPieceActivateEvent.class, new Listener<SegmentPieceActivateEvent>()
+        /*StarLoader.registerListener(SegmentPieceActivateEvent.class, new Listener<SegmentPieceActivateEvent>()
         {
             @Override
             public void onEvent(SegmentPieceActivateEvent event)
             {
-                debug();
+                //debug();
                 SegmentPiece segmentPiece = event.getSegmentPiece();
                 if (segmentPiece.getType() == logicalGravityUnit.id)
                 {
-                    debug();
+                    //debug();
                     //checkLogicalGravity(player, segmentPiece);
                     //segmentPiece.setTextureId(textureLGUon);
                 }
             }
-        }, this);
+        }, this);*/
 
         StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>()
         {
@@ -138,12 +135,12 @@ public class LogicalGravityUnits extends StarMod
                 SegmentPiece segmentPiece = event.getSegmentPiece();
                 //Vector3f gravityDirection = getVectorFromDirection(segmentPiece.getOrientation());
 
-                if (segmentPiece.getType() == logicalGravityUnit.id)
+                /*if (segmentPiece.getType() == logicalGravityUnit.id)
                 {
-                    debug();
+                    //debug();
                     //checkLogicalGravity(player, segmentPiece);
                 }
-                else if (segmentPiece.getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || segmentPiece.getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
+                else */if (segmentPiece.getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || segmentPiece.getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
                 {
                     SegmentPiece gravityUnit = getFirstControlled(segmentPiece, logicalGravityUnit.id);
                     if (gravityUnit != null)
@@ -210,10 +207,10 @@ public class LogicalGravityUnits extends StarMod
         }, this);
     }
 
-    void debug()
+    /*void debug()
     {
         return;
-    }
+    }*/
 
     public boolean checkLogicalGravity(PlayerCharacter player, SegmentPiece segmentPiece)
     {
@@ -258,7 +255,7 @@ public class LogicalGravityUnits extends StarMod
 
     public ArrayList<SegmentPiece> getControlled(SegmentPiece segmentPiece, short typeId)
     {
-        ArrayList<SegmentPiece> segmentPieces = new ArrayList<SegmentPiece>();
+        ArrayList<SegmentPiece> segmentPieces = new ArrayList<>();
         PositionControl gravityElements = segmentPiece.getSegmentController().getControlElementMap().getControlledElements(typeId, segmentPiece.getAbsolutePos(new Vector3i()));
 
         if (gravityElements.getControlMap().size() > 0)
@@ -282,7 +279,7 @@ public class LogicalGravityUnits extends StarMod
 
         if (gravityElements.getControlMap().size() > 0)
         {
-            Long grav = gravityElements.getControlPosMap().iterator().nextLong();
+            long grav = gravityElements.getControlPosMap().iterator().nextLong();
             SegmentPiece pointUnsave = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(grav);
 
             if (pointUnsave != null)
