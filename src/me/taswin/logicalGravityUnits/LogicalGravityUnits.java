@@ -42,17 +42,17 @@ public class LogicalGravityUnits extends StarMod
     @Override
     public void onBlockConfigLoad(BlockConfig config)
     {
-        short[] texOn = new short[]
+        short[] texOff = new short[]
         {
             customTextureIds[0], customTextureIds[2], customTextureIds[4], customTextureIds[4], customTextureIds[4], customTextureIds[4]
         };
-        short[] texOff = new short[]
+        short[] texOn = new short[]
         {
             customTextureIds[1], customTextureIds[3], customTextureIds[5], customTextureIds[5], customTextureIds[5], customTextureIds[5]
         };
 
 
-        logicalGravityUnit = config.newElement(this, "Logical Gravity Unit", texOn);//ElementKeyMap.getInfo(56).getTextureIds());//new short[]{288, 289, 290, 290, 290, 290});
+        logicalGravityUnit = config.newElement(this, "Logical Gravity Unit", texOff);//ElementKeyMap.getInfo(56).getTextureIds());//new short[]{288, 289, 290, 290, 290, 290});
         logicalGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
 
         logicalGravityUnit.volume = 0.1f;
