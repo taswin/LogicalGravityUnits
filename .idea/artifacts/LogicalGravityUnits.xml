@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LogicalGravityUnits">
+    <output-path>$PROJECT_DIR$/../../../../Games/Steam/steamapps/common/StarMade beta/StarMade/mods</output-path>
+    <root id="archive" name="LogicalGravityUnits.jar">
+      <element id="module-output" name="LogicalGravityUnits" />
+    </root>
+  </artifact>
+</component>

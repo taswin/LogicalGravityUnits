@@ -1,0 +1,16 @@
+{
+  "name": "LogicalGravityUnits",
+  "author": "taswin",
+  "description": "A mod that adds gravity Units that have better logic options.",
+  "version": "0.0.1",
+  "starmade_version": "dev - v0.202.108",
+  "client_mod": false,
+  "server_mod": false,
+  "main_class": "me.taswin.logicalGravityUnits.LogicalGravityUnits",
+  "smd_resource_id": 98766,
+  "dependencies": [
+    -1
+  ],
+  "core_mod": false,
+  "requires_class_resize": false
+}
