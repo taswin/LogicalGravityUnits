@@ -309,6 +309,7 @@ public class LogicalGravityUnits extends StarMod
             if (activationMod != null)
                 list[sp.getOrientation() + 1] = !activationMod.isActive();
         }
+
         SegmentPiece slave = getFirstControlled(segmentPiece, antiGravityUnit.id);
         if (slave != null)
         {
