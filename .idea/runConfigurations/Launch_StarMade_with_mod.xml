@@ -2,7 +2,7 @@
   <configuration default="false" name="Launch StarMade with mod" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/../../../../Games/Steam/steamapps/common/StarMade beta/StarMade/StarMade.jar" />
     <option name="VM_PARAMETERS" value="-javaagent:starloader.jar -Xmx6G -Xms6G" />
-    <option name="PROGRAM_PARAMETERS" value="-force -uplink localhost 4242 98766,-1" />
+    <option name="PROGRAM_PARAMETERS" value="-force -uplink localhost 4242 8239,-1" />
     <option name="WORKING_DIRECTORY" value="D:\Games\Steam\steamapps\common\StarMade beta\StarMade" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">

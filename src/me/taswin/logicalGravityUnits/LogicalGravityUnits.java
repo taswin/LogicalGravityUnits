@@ -28,6 +28,7 @@ public class LogicalGravityUnits extends StarMod
     ElementInformation logicalGravityUnit;
     ElementInformation antiGravityUnit;
     short[] customTextureIds;
+    short[] customIconIds;
 
     static final Vector3f[] gravityDirections = new Vector3f[]
         {
@@ -60,7 +61,7 @@ public class LogicalGravityUnits extends StarMod
         };
 
         logicalGravityUnit = BlockConfig.newElement(this, "Logical Gravity Unit", lguTextures);
-        logicalGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
+        logicalGravityUnit.setBuildIconNum(customIconIds[0]);
 
         logicalGravityUnit.volume = 0.1f;
         logicalGravityUnit.setMaxHitPointsE(100);
@@ -89,7 +90,7 @@ public class LogicalGravityUnits extends StarMod
         };
 
         antiGravityUnit = BlockConfig.newElement(this, "Anti Gravity Unit", aguTextures);
-        antiGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
+        antiGravityUnit.setBuildIconNum(customIconIds[1]);
 
         antiGravityUnit.volume = 0.1f;
         antiGravityUnit.setMaxHitPointsE(100);
@@ -107,10 +108,10 @@ public class LogicalGravityUnits extends StarMod
 
         BlockConfig.add(antiGravityUnit);
 
-        //BlockConfig.addRecipe(antiGravityUnit, 5, 3,
-        //        new FactoryResource(1, (short) 56),//gravity Unit
-        //        new FactoryResource(10, (short) 440),//Metal Mesh
-        //        new FactoryResource(10, (short) 220));//Crystal Compisite
+        BlockConfig.addRecipe(antiGravityUnit, 5, 3,
+                new FactoryResource(1, (short) 56),//gravity Unit
+                new FactoryResource(10, (short) 440),//Metal Mesh
+                new FactoryResource(10, (short) 220));//Crystal Compisite
 
         for (short id : ElementKeyMap.signalArray) BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(id), logicalGravityUnit);
         BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(ElementKeyMap.SIGNAL_TRIGGER_AREA_CONTROLLER), logicalGravityUnit);//Trigger (Area) Controller
@@ -130,25 +131,35 @@ public class LogicalGravityUnits extends StarMod
     @Override
     public void onEnable()
     {
-        BufferedImage img = null;
+        BufferedImage blocksImg = null;
+        BufferedImage build_iconsImg = null;
         try
         {
-            img = ImageIO.read(getJarResource("me/taswin/logicalGravityUnits/resources/blocks/logicalGravityUnit.png"));
+            blocksImg = ImageIO.read(getJarResource("me/taswin/logicalGravityUnits/resources/blocks.png"));
+            build_iconsImg = ImageIO.read(getJarResource("me/taswin/logicalGravityUnits/resources/build-icons.png"));
         } catch (IOException e)
         {
             e.printStackTrace();
         }
 
-        if (img != null)
+        if (blocksImg != null)
         {
             customTextureIds = new short[]
             {
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(0, 0, 256, 256)).getTextureId(),//On top
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(768, 0, 256, 256)).getTextureId(),//Off top
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(256, 0, 256, 256)).getTextureId(),//On bottom
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1024, 0, 256, 256)).getTextureId(),//Off bottom
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(512, 0, 256, 256)).getTextureId(),//On side
-                (short)StarLoaderTexture.newBlockTexture(img.getSubimage(1280, 0, 256, 256)).getTextureId()//Off side
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(0, 0, 256, 256)).getTextureId(),//On top
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(768, 0, 256, 256)).getTextureId(),//Off top
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(256, 0, 256, 256)).getTextureId(),//On bottom
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(1024, 0, 256, 256)).getTextureId(),//Off bottom
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(512, 0, 256, 256)).getTextureId(),//On side
+                (short) StarLoaderTexture.newBlockTexture(blocksImg.getSubimage(1280, 0, 256, 256)).getTextureId()//Off side
+            };
+        }
+        if (build_iconsImg != null)
+        {
+            customIconIds = new short[]
+            {
+                (short)StarLoaderTexture.newIconTexture(build_iconsImg.getSubimage(0, 0, 64, 64)).getTextureId(),
+                (short)StarLoaderTexture.newIconTexture(build_iconsImg.getSubimage(64, 0, 64, 64)).getTextureId()
             };
         }
 

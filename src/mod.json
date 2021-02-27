@@ -2,12 +2,12 @@
   "name": "Logical Gravity Units",
   "author": "taswin",
   "description": "A mod that adds gravity Units that have better logic options.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "starmade_version": "dev - v0.202.108",
   "client_mod": false,
   "server_mod": false,
   "main_class": "me.taswin.logicalGravityUnits.LogicalGravityUnits",
-  "smd_resource_id": 98766,
+  "smd_resource_id": 8239,
   "dependencies": [
     -1
   ],
