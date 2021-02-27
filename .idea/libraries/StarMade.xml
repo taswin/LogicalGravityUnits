@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="StarMade">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../StarMade" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

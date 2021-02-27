@@ -7,11 +7,11 @@ import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.block.SendableSegmentControllerFireActivationEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.utils.StarRunnable;
 import api.utils.textures.StarLoaderTexture;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.PositionControl;
 import org.schema.game.common.controller.SendableSegmentController;
-import org.schema.game.common.controller.elements.BlockActivationListenerInterface;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.*;
 import org.schema.game.common.data.physics.PairCachingGhostObjectAlignable;
@@ -26,6 +26,7 @@ import java.util.*;
 public class LogicalGravityUnits extends StarMod
 {
     ElementInformation logicalGravityUnit;
+    ElementInformation antiGravityUnit;
     short[] customTextureIds;
 
     static final Vector3f[] gravityDirections = new Vector3f[]
@@ -39,17 +40,26 @@ public class LogicalGravityUnits extends StarMod
                 new Vector3f(-9.89F, 0.0F, 0.0F)
         };
 
+    enum directionNames
+    {
+        None,
+        Port,
+        Starboard,
+        Zenith,
+        Nadir,
+        Aft,
+        Bow
+    }
+
     @Override
     public void onBlockConfigLoad(BlockConfig config)
     {
         short[] lguTextures = new short[]
         {
             customTextureIds[0], customTextureIds[2], customTextureIds[4], customTextureIds[4], customTextureIds[4], customTextureIds[4]//on
-            //customTextureIds[1], customTextureIds[3], customTextureIds[5], customTextureIds[5], customTextureIds[5], customTextureIds[5]//off
         };
 
-
-        logicalGravityUnit = BlockConfig.newElement(this, "Logical Gravity Unit", lguTextures);//ElementKeyMap.getInfo(56).getTextureIds());//new short[]{288, 289, 290, 290, 290, 290});
+        logicalGravityUnit = BlockConfig.newElement(this, "Logical Gravity Unit", lguTextures);
         logicalGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
 
         logicalGravityUnit.volume = 0.1f;
@@ -57,16 +67,14 @@ public class LogicalGravityUnits extends StarMod
         logicalGravityUnit.setArmorValue(1);
 
         logicalGravityUnit.setOrientatable(true);
-        logicalGravityUnit.setHasActivationTexure(true);
+        //logicalGravityUnit.setHasActivationTexure(true);
         logicalGravityUnit.sideTexturesPointToOrientation = true;
 
         logicalGravityUnit.setInventoryGroup("LGU");
 
-        logicalGravityUnit.setCanActivate(true);
-        logicalGravityUnit.signal = true;
+        //logicalGravityUnit.setCanActivate(true);
+        //logicalGravityUnit.signal = true;
         logicalGravityUnit.drawLogicConnection = true;
-
-        //logicalGravityUnit.text
 
         BlockConfig.add(logicalGravityUnit);
 
@@ -75,14 +83,48 @@ public class LogicalGravityUnits extends StarMod
                 new FactoryResource(10, (short) 440),//Metal Mesh
                 new FactoryResource(10, (short) 220));//Crystal Compisite
 
-        //BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(405), logicalGravityUnit);//Activation Module
-        //BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(666), logicalGravityUnit);//Button
-        //BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(413), logicalGravityUnit);//Trigger (Area) Controller
+        short[] aguTextures = new short[]
+        {
+            customTextureIds[1]
+        };
 
-        //BlockConfig.setBlocksConnectable(logicalGravityUnit, ElementKeyMap.getInfo(405));//Button
-        //BlockConfig.setBlocksConnectable(logicalGravityUnit, logicalGravityUnit);
+        antiGravityUnit = BlockConfig.newElement(this, "Anti Gravity Unit", aguTextures);
+        antiGravityUnit.setBuildIconNum(ElementKeyMap.getInfo(56).buildIconNum);
 
-        //logicalGravityUnit.setCanActivate(false);
+        antiGravityUnit.volume = 0.1f;
+        antiGravityUnit.setMaxHitPointsE(100);
+        antiGravityUnit.setArmorValue(1);
+
+        antiGravityUnit.setOrientatable(false);
+        //logicalGravityUnit.setHasActivationTexure(true);
+        //logicalGravityUnit.sideTexturesPointToOrientation = true;
+
+        antiGravityUnit.setInventoryGroup("LGU");
+
+        //logicalGravityUnit.setCanActivate(true);
+        //logicalGravityUnit.signal = true;
+        antiGravityUnit.drawLogicConnection = true;
+
+        BlockConfig.add(antiGravityUnit);
+
+        //BlockConfig.addRecipe(antiGravityUnit, 5, 3,
+        //        new FactoryResource(1, (short) 56),//gravity Unit
+        //        new FactoryResource(10, (short) 440),//Metal Mesh
+        //        new FactoryResource(10, (short) 220));//Crystal Compisite
+
+        for (short id : ElementKeyMap.signalArray) BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(id), logicalGravityUnit);
+        BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(ElementKeyMap.SIGNAL_TRIGGER_AREA_CONTROLLER), logicalGravityUnit);//Trigger (Area) Controller
+
+        BlockConfig.setBlocksConnectable(logicalGravityUnit, ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID));//Activation Module
+        BlockConfig.setBlocksConnectable(logicalGravityUnit, logicalGravityUnit);
+        BlockConfig.setBlocksConnectable(logicalGravityUnit, antiGravityUnit);
+
+        for (short id : ElementKeyMap.signalArray) BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(id), antiGravityUnit);
+        BlockConfig.setBlocksConnectable(ElementKeyMap.getInfo(ElementKeyMap.SIGNAL_TRIGGER_AREA_CONTROLLER), antiGravityUnit);//Trigger (Area) Controller
+
+        BlockConfig.setBlocksConnectable(antiGravityUnit, ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID));//Activation Module
+        BlockConfig.setBlocksConnectable(antiGravityUnit, antiGravityUnit);
+        BlockConfig.setBlocksConnectable(antiGravityUnit, logicalGravityUnit);
     }
 
     @Override
@@ -115,13 +157,23 @@ public class LogicalGravityUnits extends StarMod
             @Override
             public void onEvent(SegmentPieceActivateEvent event)
             {
-                //debug();
                 SegmentPiece segmentPiece = event.getSegmentPiece();
-                if (segmentPiece.getType() == logicalGravityUnit.id)
+                debug();
+                /*if (segmentPiece.getType() == logicalGravityUnit.id)
                 {
-                    //debug();
-                    //checkLogicalGravity(player, segmentPiece);
-                    //segmentPiece.setTextureId(textureLGUon);
+                    debug();
+                    //event.setCanceled(true);
+                }
+                /*if (segmentPiece.getInfo().isSignal() && segmentPiece.isActive())
+                {
+                    ArrayList<SegmentPiece> lgus = getControlled(segmentPiece, logicalGravityUnit.id);
+                    if (lgus.size() > 0)
+                    {
+                        for (SegmentPiece lgu : lgus)
+                        {
+                            lgu.setActive(!lgu.isActive());
+                        }
+                    }
                 }
             }
         }, this);*/
@@ -129,22 +181,44 @@ public class LogicalGravityUnits extends StarMod
         StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>()
         {
             @Override
-            public void onEvent(SegmentPieceActivateByPlayer event)
+            public void onEvent(final SegmentPieceActivateByPlayer event)
             {
                 PlayerCharacter player = event.getPlayer().getAssingedPlayerCharacter();
-                SegmentPiece segmentPiece = event.getSegmentPiece();
+                final SegmentPiece segmentPiece = event.getSegmentPiece();
                 //Vector3f gravityDirection = getVectorFromDirection(segmentPiece.getOrientation());
 
-                /*if (segmentPiece.getType() == logicalGravityUnit.id)
+                if (segmentPiece.getType() == logicalGravityUnit.id || segmentPiece.getType() == antiGravityUnit.id)
                 {
-                    //debug();
-                    //checkLogicalGravity(player, segmentPiece);
+                    //segmentPiece.setActive(!segmentPiece.isActive());
+                    checkLogicalGravity(player, segmentPiece);
                 }
-                else */if (segmentPiece.getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || segmentPiece.getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
+                /*else if (segmentPiece.getType() == antiGravityUnit.id)
+                {
+                    //segmentPiece.setActive(!segmentPiece.isActive());
+
+                    player.scheduleGravity(gravityDirections[0], segmentPiece.getSegmentController());
+                    player.sendClientMessage("Has left gravity!", 3);
+                }*/
+                else if (segmentPiece.getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || segmentPiece.getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
                 {
                     SegmentPiece gravityUnit = getFirstControlled(segmentPiece, logicalGravityUnit.id);
+                    if (gravityUnit == null)
+                        gravityUnit = getFirstControlled(segmentPiece, antiGravityUnit.id);
                     if (gravityUnit != null)
+                    {
+                        /*final long a = gravityUnit.getAbsoluteIndex();
+                        final boolean b = gravityUnit.isActive();
+                        new StarRunnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                event.getPlayer().getAssingedPlayerCharacter().sendClientMessage("2", 3);
+                                event.getSegmentPiece().getSegmentController().getSegmentBuffer().getPointUnsave(a).setActive(true);//a);
+                            }
+                        }.runLater(100);*/
                         checkLogicalGravity(player, gravityUnit);
+                    }
                 }
             }
         }, this);
@@ -173,6 +247,8 @@ public class LogicalGravityUnits extends StarMod
                     if (player != null && pointUnsave != null)
                     {
                         SegmentPiece firstLGU = getFirstControlled(pointUnsave, logicalGravityUnit.id);
+                        if (firstLGU == null)
+                            firstLGU = getFirstControlled(pointUnsave, antiGravityUnit.id);
                         if (firstLGU != null)
                         {
                             checkLogicalGravity(player, firstLGU);
@@ -205,46 +281,57 @@ public class LogicalGravityUnits extends StarMod
                 }
             }
         }, this);
-    }
+    }/*
 
-    /*void debug()
+    void debug()
     {
         return;
     }*/
 
     public boolean checkLogicalGravity(PlayerCharacter player, SegmentPiece segmentPiece)
     {
-        Boolean state = segmentPiece.isActive();//true;
+        byte targetDir = 0;
+        if (segmentPiece.getType() == logicalGravityUnit.id)
+            targetDir = (byte)(segmentPiece.getOrientation() + 1);
 
-        /*SegmentPiece activationMod = getFirstControlled(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
+        Boolean state = true;//segmentPiece.isActive();//
+
+        SegmentPiece activationMod = getFirstControlled(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
         if (activationMod != null)
-            state = activationMod.isActive();*/
+            state = activationMod.isActive();
 
         ArrayList<SegmentPiece> slaves = getControlled(segmentPiece, logicalGravityUnit.id);
-
-        Boolean[] list = new Boolean[] {false, false, false, false, false, false, false};
+        Boolean[] list = new Boolean[] {true, true, true, true, true, true, true};
         for (SegmentPiece sp : slaves)
         {
-            list[sp.getOrientation() + 1] = sp.isActive();
-
-            /*activationMod = getFirstControlled(sp, ElementKeyMap.ACTIVAION_BLOCK_ID);
-            if (activationMod == null)
-                a[sp.getOrientation() + 1] = !state;
-            else
-                a[sp.getOrientation() + 1] = activationMod.isActive() ^ state;*/
+            //list[sp.getOrientation() + 1] = sp.isActive();
+            activationMod = getFirstControlled(sp, ElementKeyMap.ACTIVAION_BLOCK_ID);
+            if (activationMod != null)
+                list[sp.getOrientation() + 1] = !activationMod.isActive();
+        }
+        SegmentPiece slave = getFirstControlled(segmentPiece, antiGravityUnit.id);
+        if (slave != null)
+        {
+            activationMod = getFirstControlled(slave, ElementKeyMap.ACTIVAION_BLOCK_ID);
+            if (activationMod != null)
+                list[0] = !activationMod.isActive();
         }
 
         byte currentGravityDir = getDirectionFromVector(player.getGravity().getAcceleration());
-        //Vector3f gravityDirection = getVectorFromDirection(segmentPiece.getOrientation());
 
         if (player.getGravity().source != segmentPiece.getSegment().getSegmentController() || currentGravityDir == -1)
         {
             currentGravityDir = 0;
         }
 
-        if (list[currentGravityDir] ^ state)
+        if (list[currentGravityDir] == state && currentGravityDir != targetDir)
         {
-            player.activateGravity(segmentPiece);
+            if (targetDir == 0)
+                player.sendClientMessage("Has left gravity!", 1);
+            else
+                player.sendClientMessage("Switched to gravity! (" + directionNames.values()[targetDir] + ")", 1);
+            player.scheduleGravity(gravityDirections[targetDir], segmentPiece.getSegmentController());
+            //player.activateGravity(segmentPiece);
             return true;
         }
 
@@ -280,14 +367,8 @@ public class LogicalGravityUnits extends StarMod
         if (gravityElements.getControlMap().size() > 0)
         {
             long grav = gravityElements.getControlPosMap().iterator().nextLong();
-            SegmentPiece pointUnsave = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(grav);
-
-            if (pointUnsave != null)
-            {
-                return pointUnsave;
-            }
+            return segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(grav);
         }
-
         return null;
     }
 
@@ -296,8 +377,6 @@ public class LogicalGravityUnits extends StarMod
         for (byte i = 0; i < 7; i++)
             if (gravityDirection.equals(gravityDirections[i]))
                 return i;
-        //if (gravityDirection.equals(new Vector3f(0.0F, 0.0F, 0.0F)))
-        //    return -1;
 
         return -1;
     }
