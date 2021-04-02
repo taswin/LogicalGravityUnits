@@ -8,9 +8,11 @@ import api.listener.events.block.SendableSegmentControllerFireActivationEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.utils.StarRunnable;
+import api.utils.game.SegmentControllerUtils;
 import api.utils.textures.StarLoaderTexture;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.PositionControl;
+import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.SendableSegmentController;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.*;
@@ -354,7 +356,11 @@ public class LogicalGravityUnits extends StarMod
                 player.sendClientMessage("Has left gravity!", 1);
             else
                 player.sendClientMessage("Switched to gravity! (" + directionNames.values()[targetDir] + ")", 1);
-            player.scheduleGravity(gravityDirections[targetDir], segmentPiece.getSegmentController());
+
+            if(!player.isOnServer())
+                player.scheduleGravity(gravityDirections[targetDir], segmentPiece.getSegmentController());
+            else
+                player.scheduleGravityServerForced(gravityDirections[targetDir], segmentPiece.getSegmentController());
             //player.activateGravity(segmentPiece);
             return true;
         }
