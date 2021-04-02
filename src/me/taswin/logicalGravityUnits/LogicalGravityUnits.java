@@ -318,7 +318,9 @@ public class LogicalGravityUnits extends StarMod
             //list[sp.getOrientation() + 1] = sp.isActive();
             activationMod = getFirstControlled(sp, ElementKeyMap.ACTIVAION_BLOCK_ID);
             if (activationMod != null)
-                list[sp.getOrientation() + 1] = !activationMod.isActive();
+                list[sp.getOrientation() + 1] = activationMod.isActive();
+            else
+                list[sp.getOrientation() + 1] = true;
         }
 
         SegmentPiece slave = getFirstControlled(segmentPiece, antiGravityUnit.id);
@@ -326,12 +328,12 @@ public class LogicalGravityUnits extends StarMod
         {
             activationMod = getFirstControlled(slave, ElementKeyMap.ACTIVAION_BLOCK_ID);
             if (activationMod != null)
-                list[0] = !activationMod.isActive();
+                list[0] = activationMod.isActive();
+            else
+                list[0] = true;
         }
 
         byte currentGravityDir = getDirectionFromVector(player.getGravity().getAcceleration());
-
-
 
         if (player.getGravity().source == segmentPiece.getSegment().getSegmentController() && currentGravityDir >= 0)
         {
@@ -346,7 +348,7 @@ public class LogicalGravityUnits extends StarMod
             currentGravityDir = 0;
         }
 
-        if (list[currentGravityDir] == state)
+        if (list[currentGravityDir] != state)
         {
             if (targetDir == 0)
                 player.sendClientMessage("Has left gravity!", 1);
